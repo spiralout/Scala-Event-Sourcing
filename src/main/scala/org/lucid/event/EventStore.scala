@@ -19,6 +19,7 @@ class EventStore extends Actor {
   
   private def store(events: List[Event]) {
     eventlist = eventlist ::: events
+    events.map(e => context.system.eventStream.publish(e))
   }
 }
 

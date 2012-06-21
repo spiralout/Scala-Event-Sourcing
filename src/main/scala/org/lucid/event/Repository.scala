@@ -9,7 +9,7 @@ import akka.util.duration._
 class Repository[A <: EventSourced[A]](store: ActorRef) {
   
   def save(events: List[Event], domain: A) = {
-    store ! StoreEvents(events)
+    store ! StoreEvents(events)    
     println(domain)
   }
   

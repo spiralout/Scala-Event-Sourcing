@@ -7,13 +7,16 @@ import akka.actor._
 import org.lucid.event._
 import org.lucid.domain._
 import org.lucid.service._
-
+import org.lucid.eventhandler._
 
 
 object Cqrs  extends App {
   val system = ActorSystem("LucidSystem")
   val eventStore = system.actorOf(Props[EventStore], name = "eventStore")
-  
+ 
+  val dumper = system.actorOf(Props[Dumper], name = "dumper")
+  system.eventStream.subscribe(dumper, classOf[Event])
+ 
   val service = new PersonService(new Repository[Person](eventStore))
 
   val person_id = service.createPerson("Bob Lablaw", 44)
