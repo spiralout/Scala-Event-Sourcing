@@ -3,7 +3,12 @@ package org.lucid.domain
 import org.lucid.event._
 import java.util.UUID
 
-case class Person(id: String, version: Long, name: String, age: Int) extends EventSourced[Person] with AggregateRoot {
+case class Person(
+  id: String, 
+  version: Long,
+  name: String, 
+  age: Int,
+  address: Option[Address] = None) extends EventSourced[Person] with AggregateRoot {
   
   def setAge(age: Int) = {
     if (age < 16) {
@@ -17,9 +22,16 @@ case class Person(id: String, version: Long, name: String, age: Int) extends Eve
     accept(PersonSetName(id, name))
   }
   
-  def handle(event: Event): Person = event match { 
-    case PersonSetName(id, name) => copy(version = version + 1, name = name)
-    case PersonSetAge(id, age) => copy(version = version + 1, 	age = age)
+  def setAddress(street: String, city: String, state: String, zip: String) = {
+    accept(PersonSetAddress(id, street, city, state, zip))
+  }
+  
+  def handle(event: Event): Person = {
+    (event match { 
+      case PersonSetName(id, name) => copy(name = name)
+      case PersonSetAge(id, age) => copy(age = age)
+      case PersonSetAddress(id, street, city, state, zip) => copy(address = Some(Address(street, city, state, zip)))
+    }).copy(version = version + 1)
   }
 }
 
@@ -38,3 +50,4 @@ case class Address(street: String, city: String, state: String, zip: String)
 case class PersonCreated(id: String, name: String, age: Int) extends Event
 case class PersonSetName(id: String, name: String) extends Event
 case class PersonSetAge(id: String, age: Int) extends Event
+case class PersonSetAddress(id: String, street: String, city: String, state: String, zip: String) extends Event

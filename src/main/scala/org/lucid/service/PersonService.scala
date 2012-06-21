@@ -25,7 +25,7 @@ class PersonService(repo: Repository[Person]) {
   	    person.setAge(age)(List[Event]()) match {
   	      case (events, Failure(error)) => throw new Exception(error)
   	      case (events, Success(person)) => {
-      	    repo.save(events, person)
+  	        repo.save(events, person)
   	      }
   	    }
   	  }
@@ -39,10 +39,24 @@ class PersonService(repo: Repository[Person]) {
   	    person.setName(name)(List[Event]()) match {
   	      case (events, Failure(error)) => throw new Exception(error)
   	      case (events, Success(person)) => {
-      	    repo.save(events, person)
+  	        repo.save(events, person)
   	      }
   	    }
   	  }
   	}
+  }
+  
+  def setPersonAddress(id: String, street: String, city: String, state: String, zip: String) = {
+    repo.load(Person, id) match {
+      case None => throw new Exception("Could not find Person with id " + id)
+      case Some(person) => {
+        person.setAddress(street, city, state, zip)(List[Event]()) match {
+          case (events, Failure(error)) => throw new Exception(error)
+          case (events, Success(person)) => {
+            repo.save(events, person) 
+          } 
+        } 
+      } 
+    } 
   } 
 }
