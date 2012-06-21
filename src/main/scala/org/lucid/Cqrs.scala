@@ -11,11 +11,9 @@ import org.lucid.eventhandler._
 
 
 object Cqrs  extends App {
-  val system = ActorSystem("LucidSystem")
+  implicit val system = ActorSystem("LucidSystem")
   val eventStore = system.actorOf(Props[EventStore], name = "eventStore")
- 
   val dumper = system.actorOf(Props[Dumper], name = "dumper")
-  system.eventStream.subscribe(dumper, classOf[Event])
  
   val service = new PersonService(new Repository[Person](eventStore))
 

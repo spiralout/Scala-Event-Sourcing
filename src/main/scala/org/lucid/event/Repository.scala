@@ -1,5 +1,8 @@
 package org.lucid.event
 
+import scalaz._
+import Scalaz._
+
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.dispatch.Await

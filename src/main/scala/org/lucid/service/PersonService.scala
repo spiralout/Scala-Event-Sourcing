@@ -9,10 +9,9 @@ import org.lucid.event._
 class PersonService(repo: Repository[Person]) {
   
   def createPerson(name: String, age: Int): String = {
-    Person.create(name, age) match {
-      case Failure(error) => throw new Exception(error)
-      case Success(state) => {
-        val (events, person) = state(List[Event]())        
+    Person.create(name, age)(List[Event]()) match {
+      case (events, Failure(error)) => throw new Exception(error)
+      case (events, Success(person)) => {
         repo.save(events, person)
         person.id
       }      
@@ -23,10 +22,9 @@ class PersonService(repo: Repository[Person]) {
     repo.load(Person, id) match {
   	  case None => throw new Exception("Oh noes!")    
   	  case Some(person) => {
-  	    person.setAge(age) match {
-  	      case Failure(error) => throw new Exception(error)
-  	      case Success(state) => {
-  	        val (events, person) = state(List[Event]())
+  	    person.setAge(age)(List[Event]()) match {
+  	      case (events, Failure(error)) => throw new Exception(error)
+  	      case (events, Success(person)) => {
       	    repo.save(events, person)
   	      }
   	    }
@@ -38,10 +36,9 @@ class PersonService(repo: Repository[Person]) {
     repo.load(Person, id) match {
   	  case None => throw new Exception("Oh noes!")    
   	  case Some(person) => {
-  	    person.setName(name) match {
-  	      case Failure(error) => throw new Exception(error)
-  	      case Success(state) => {
-  	        val (events, person) = state(List[Event]())
+  	    person.setName(name)(List[Event]()) match {
+  	      case (events, Failure(error)) => throw new Exception(error)
+  	      case (events, Success(person)) => {
       	    repo.save(events, person)
   	      }
   	    }

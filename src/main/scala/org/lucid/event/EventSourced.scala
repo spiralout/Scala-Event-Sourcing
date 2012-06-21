@@ -7,16 +7,19 @@ trait Event {
   val id: String
 }
 
-trait EventSourced[A] {  
-  def accept(event: Event): Validation[String, State[List[Event], A]] = {
-    Success(state[List[Event], A](events => (events :::List[Event](event), handle(event))))
+
+trait EventSourced[A] { 
+  type Update[A] = State[List[Event], Validation[String, A]]
+
+  def accept(event: Event): Update[A] = {
+    state[List[Event], Validation[String, A]](events => (events :::List[Event](event), Success(handle(event))))
   }  
   
-  def reject(error: String): Validation[String, State[List[Event], A]] = {
-    Failure(error)
+  def reject(error: String): Update[A] = {
+    state[List[Event], Validation[String, A]](events => (events, Failure(error)))
   }
   
-  def handle(event: Event): A  
+  def handle(event: Event): A
 }
 
 trait EventSourcedCreator[A <: EventSourced[A]] { 
